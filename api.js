@@ -1,8 +1,7 @@
-// Замени на свой, чтобы получить независимый от других набор данных.
-// "боевая" версия инстапро лежит в ключе prod
 const personalKey = "prod";
-const baseHost = "https://wedev-api.sky.pro/api/v1";
-const postsHost = `${baseHost}/${personalKey}/instapro`;
+const authBaseHost = "https://wedev-api.sky.pro";
+const postsBaseHost = "https://wedev-api.sky.pro/api/v1";
+const postsHost = `${postsBaseHost}/${personalKey}/instapro`;
 
 export function getPosts({ token }) {
   return fetch(postsHost, {
@@ -15,7 +14,6 @@ export function getPosts({ token }) {
       if (response.status === 401) {
         throw new Error("Нет авторизации");
       }
-
       return response.json();
     })
     .then((data) => {
@@ -24,11 +22,8 @@ export function getPosts({ token }) {
 }
 
 export function registerUser({ login, password, name, imageUrl }) {
-  return fetch(baseHost + "/user", {
+  return fetch(`${authBaseHost}/api/user`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       login,
       password,
@@ -44,11 +39,8 @@ export function registerUser({ login, password, name, imageUrl }) {
 }
 
 export function loginUser({ login, password }) {
-  return fetch(baseHost + "/user/login", {
+  return fetch(`${authBaseHost}/api/user/login`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       login,
       password,
@@ -61,26 +53,31 @@ export function loginUser({ login, password }) {
   });
 }
 
-// Загружает картинку в облако, возвращает url загруженной картинки
 export function uploadImage({ file }) {
   const data = new FormData();
   data.append("file", file);
 
-  return fetch(baseHost + "/upload/image", {
+  return fetch(`${authBaseHost}/api/upload/image`, {
     method: "POST",
     body: data,
-  }).then((response) => {
-    return response.json();
-  });
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Ошибка загрузки изображения");
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Ошибка загрузки изображения:", error);
+      throw new Error("Не удалось загрузить изображение. Попробуйте позже.");
+    });
 }
 
-// Создаёт новый пост
 export function createPost({ token, description, imageUrl }) {
   return fetch(postsHost, {
     method: "POST",
     headers: {
       Authorization: token,
-      "Content-Type": "application/json",
     },
     body: JSON.stringify({ description, imageUrl }),
   }).then((response) => {
@@ -94,7 +91,6 @@ export function createPost({ token, description, imageUrl }) {
   });
 }
 
-// Получает посты конкретного пользователя
 export function getUserPosts({ token, userId }) {
   return fetch(`${postsHost}/user-posts/${userId}`, {
     method: "GET",
@@ -109,7 +105,6 @@ export function getUserPosts({ token, userId }) {
   });
 }
 
-// Ставит лайк на пост
 export function likePostApi({ token, postId }) {
   return fetch(`${postsHost}/${postId}/like`, {
     method: "POST",
@@ -124,7 +119,6 @@ export function likePostApi({ token, postId }) {
   });
 }
 
-// Убирает лайк с поста
 export function dislikePostApi({ token, postId }) {
   return fetch(`${postsHost}/${postId}/dislike`, {
     method: "POST",

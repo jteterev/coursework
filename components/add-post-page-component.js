@@ -30,12 +30,10 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
       appEl.querySelector(".form-error").textContent = message;
     };
 
-    // Рендерим заголовок страницы
     renderHeaderComponent({
       element: appEl.querySelector(".header-container"),
     });
 
-    // Рендерим компонент загрузки изображения
     const uploadImageContainer = appEl.querySelector(".upload-image-container");
     if (uploadImageContainer) {
       renderUploadImageComponent({
@@ -46,7 +44,6 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
       });
     }
 
-    // Обработчик клика на кнопку публикации
     document.getElementById("add-button").addEventListener("click", () => {
       setError("");
 

@@ -25,15 +25,13 @@ import {
 export let user = getUserFromLocalStorage();
 export let page = null;
 export let posts = [];
-export let userPosts = []; // Посты конкретного пользователя
+export let userPosts = [];
 
 export const likePost = async (postId, isLiked) => {
   if (isLiked) {
-    // Снимаем лайк
     const result = await dislikePostApi({ token: getToken(), postId });
     return result.post;
   } else {
-    // Ставим лайк
     const result = await likePostApi({ token: getToken(), postId });
     return result.post;
   }
@@ -50,9 +48,6 @@ export const logout = () => {
   goToPage(POSTS_PAGE);
 };
 
-/**
- * Включает страницу приложения
- */
 export const goToPage = (newPage, data) => {
   if (
     [
@@ -64,7 +59,6 @@ export const goToPage = (newPage, data) => {
     ].includes(newPage)
   ) {
     if (newPage === ADD_POSTS_PAGE) {
-      /* Если пользователь не авторизован, то отправляем его на страницу авторизации перед добавлением поста */
       page = user ? ADD_POSTS_PAGE : AUTH_PAGE;
       return renderApp();
     }

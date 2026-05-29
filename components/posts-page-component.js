@@ -1,13 +1,6 @@
-import { goToPage, likePost } from "../index.js";
+import { goToPage, likePost, user, posts, userPosts } from "../index.js";
 import { renderHeaderComponent } from "./header-component.js";
-import {
-  posts,
-  userPosts,
-  user,
-  page,
-  POSTS_PAGE,
-  USER_POSTS_PAGE,
-} from "../index.js";
+import { USER_POSTS_PAGE } from "../routes.js";
 
 export function renderPostsPageComponent({ appEl, postsData = null }) {
   const render = () => {
@@ -75,7 +68,6 @@ export function renderPostsPageComponent({ appEl, postsData = null }) {
       postsList.appendChild(postElement);
     });
 
-    // Обработчики кликов на аватары пользователей
     for (let userEl of appEl.querySelectorAll(".post-header")) {
       userEl.addEventListener("click", () => {
         goToPage(USER_POSTS_PAGE, {
@@ -84,7 +76,6 @@ export function renderPostsPageComponent({ appEl, postsData = null }) {
       });
     }
 
-    // Обработчики лайков
     for (let likeButton of appEl.querySelectorAll(".like-button")) {
       likeButton.addEventListener("click", async () => {
         if (!user) {
@@ -102,7 +93,6 @@ export function renderPostsPageComponent({ appEl, postsData = null }) {
         try {
           const updatedPost = await likePost(postId, isLiked);
 
-          // Обновляем UI на основе ответа от API
           const likesCount = updatedPost.likes ? updatedPost.likes.length : 0;
           const newIsLiked = updatedPost.isLiked === true;
 

@@ -195,6 +195,32 @@
   box-sizing: border-box;
   width: 100%;
   text-align: center;
+  cursor: pointer;
+}
+
+.upload-image-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.upload-url-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.upload-url-container .input {
+  flex: 1;
+}
+
+.upload-url-container .button {
+  white-space: nowrap;
+}
+
+.file-upload-image-conrainer {
+  display: flex;
+  align-items: center;
 }
 
 .upload-image-container {

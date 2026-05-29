@@ -1,27 +1,8 @@
 import { uploadImage } from "../api.js";
 
-/**
- * Компонент загрузки изображения.
- * Этот компонент позволяет пользователю загружать изображение и отображать его превью.
- * Если изображение уже загружено, пользователь может заменить его.
- *
- * @param {HTMLElement} params.element - HTML-элемент, в который будет рендериться компонент.
- * @param {Function} params.onImageUrlChange - Функция, вызываемая при изменении URL изображения.
- *                                            Принимает один аргумент - новый URL изображения или пустую строку.
- */
 export function renderUploadImageComponent({ element, onImageUrlChange }) {
-  /**
-   * URL текущего изображения.
-   * Изначально пуст, пока пользователь не загрузит изображение.
-   * @type {string}
-   */
   let imageUrl = "";
 
-  /**
-   * Функция рендеринга компонента.
-   * Отображает интерфейс компонента в зависимости от состояния: 
-   * либо форма выбора файла, либо превью загруженного изображения с кнопкой замены.
-   */
   const render = () => {
     element.innerHTML = `
       <div class="upload-image">
@@ -34,20 +15,25 @@ export function renderUploadImageComponent({ element, onImageUrlChange }) {
             </div>
             `
             : `
-            <label class="file-upload-label secondary-button">
-              <input
-                type="file"
-                class="file-upload-input"
-                style="display:none"
-              />
-              Выберите фото
-            </label>
+            <div class="upload-image-options">
+              <label class="file-upload-label secondary-button">
+                <input
+                  type="file"
+                  class="file-upload-input"
+                  style="display:none"
+                />
+                Выберите фото
+              </label>
+              <div class="upload-url-container">
+                <input type="text" class="input" id="upload-url-input" placeholder="Или вставьте URL изображения" />
+                <button class="button" id="upload-url-button">Добавить</button>
+              </div>
+            </div>
           `
         }
       </div>
     `;
 
-    // Обработчик выбора файла
     const fileInputElement = element.querySelector(".file-upload-input");
     fileInputElement?.addEventListener("change", () => {
       const file = fileInputElement.files[0];
@@ -55,26 +41,44 @@ export function renderUploadImageComponent({ element, onImageUrlChange }) {
         const labelEl = document.querySelector(".file-upload-label");
         labelEl.setAttribute("disabled", true);
         labelEl.textContent = "Загружаю файл...";
-        
-        // Загружаем изображение с помощью API
-        uploadImage({ file }).then(({ fileUrl }) => {
-          imageUrl = fileUrl; // Сохраняем URL загруженного изображения
-          onImageUrlChange(imageUrl); // Уведомляем о изменении URL изображения
-          render(); // Перерисовываем компонент с новым состоянием
-        });
+
+        uploadImage({ file })
+          .then(({ fileUrl }) => {
+            imageUrl = fileUrl;
+            onImageUrlChange(imageUrl);
+            render();
+          })
+          .catch((error) => {
+            console.error(error);
+            labelEl.removeAttribute("disabled");
+            labelEl.textContent = "Выберите фото";
+            alert(error.message || "Не удалось загрузить изображение");
+          });
       }
     });
 
-    // Обработчик удаления изображения
+    const uploadUrlButton = element.querySelector("#upload-url-button");
+    uploadUrlButton?.addEventListener("click", () => {
+      const urlInput = element.querySelector("#upload-url-input");
+      const url = urlInput?.value.trim();
+
+      if (url) {
+        imageUrl = url;
+        onImageUrlChange(imageUrl);
+        render();
+      } else {
+        alert("Введите URL изображения");
+      }
+    });
+
     element
       .querySelector(".file-upload-remove-button")
       ?.addEventListener("click", () => {
-        imageUrl = ""; // Сбрасываем URL изображения
-        onImageUrlChange(imageUrl); // Уведомляем об изменении URL изображения
-        render(); // Перерисовываем компонент
+        imageUrl = "";
+        onImageUrlChange(imageUrl);
+        render();
       });
   };
 
-  // Инициализация компонента
   render();
 }
