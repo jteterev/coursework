@@ -86,8 +86,11 @@ export const goToPage = (newPage, data) => {
       const token = getToken();
       const userId = data?.userId;
 
+      console.log("Загрузка постов пользователя:", userId);
+
       return getUserPosts({ token, userId })
         .then((response) => {
+          console.log("Ответ API постов пользователя:", response);
           userPosts = response.posts || [];
           page = USER_POSTS_PAGE;
           renderApp();
@@ -155,6 +158,7 @@ const renderApp = () => {
   if (page === USER_POSTS_PAGE) {
     return renderPostsPageComponent({
       appEl,
+      postsData: userPosts,
     });
   }
 };

@@ -20,6 +20,8 @@ export function renderPostsPageComponent({ appEl, postsData = null }) {
     const postsList = appEl.querySelector(".posts");
     const currentPosts = postsData !== null ? postsData : posts;
 
+    console.log("Рендер постов, currentPosts:", currentPosts);
+
     if (currentPosts.length === 0) {
       postsList.innerHTML =
         '<li class="post"><p class="post-text">Постов пока нет</p></li>';
